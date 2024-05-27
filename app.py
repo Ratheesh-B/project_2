@@ -37,11 +37,8 @@ def getTransactions():
                     clm['State'].append(i)
                     clm["Year"].append(j)
                     clm["Quater"].append(k)
-    Agg_Trans=pd.DataFrame(clm)
-    data = Agg_Trans[['State','Transacion_count']]
-    df = data.groupby(by ="State").sum()
-    df.reset_index(inplace = True)                 
-    return df
+    Agg_Trans=pd.DataFrame(clm)                  
+    return Agg_Trans
 
 def getInsurance():
     path = "C:\\Users\\HP\\Dataset\\pulse\\data\\aggregated\\insurance\\country\\india\\state"
@@ -64,10 +61,10 @@ def getInsurance():
                     clm['State'].append(i)
                     clm["Year"].append(j)
                     clm["Quater"].append(k)
-    Agg_Trans=pd.DataFrame(clm)
-    data = Agg_Trans[['State','Transacion_count']]
+    Agg_ins=pd.DataFrame(clm)
+    data = Agg_ins[['State','Transacion_count']]
     df = data.groupby(by ="State").sum()
-    df.reset_index(inplace = True)                 
+    df.reset_index(inplace = True)                   
     return df
 
 def getUsers():
@@ -96,17 +93,18 @@ def getUsers():
     df.reset_index(inplace = True)                 
     return df    
 
-def getTransactionsMap(df):
-    fig = px.choropleth(
+def getInsuranceMap(df):
+    fig1 = px.choropleth(
                   df,
                   geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
                   featureidkey='properties.ST_NM',
                   locations = 'State',
                   color = 'Transacion_count',
                   color_continuous_scale='blugrn')
-        
-    fig.update_geos(fitbounds="locations", visible=False)
-    st.plotly_chart(fig,use_container_width=True)
+    fig2 = px.bar(df, x="Transacion_count", y="State",color='Transacion_count',color_continuous_scale = 'blugrn', orientation='h')
+    fig1.update_geos(fitbounds="locations", visible=False)
+    st.plotly_chart(fig1,use_container_width=True)
+    st.plotly_chart(fig2,use_container_width=True)
 
 def getTransactionsMap(df):
     fig = px.choropleth(
@@ -132,6 +130,8 @@ def getUsersDistribution(df):
     fig.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig,use_container_width=True)
 
+
+
 # Setting up page configuration
 icon = Image.open(r"C:\Users\HP\Downloads\pngtree-analytics-icon-design-template-vector-isolated-png-image_745938.jpg")
 json_data = json.load(open(r"C:\Users\HP\Downloads\states_india.geojson","r"))
@@ -154,7 +154,7 @@ if selected =="Insurance":
     option = st.selectbox('Select one option',('','Nationwide Total Insurance'))
     if(option == 'Nationwide Total Insurance'):
         df = getInsurance()
-        getTransactionsMap(df)
+        getInsuranceMap(df)
 
 
 if selected == "Transactions":
@@ -163,8 +163,20 @@ if selected == "Transactions":
        ('','Nationwide Total Transactions'))
     if(option == 'Nationwide Total Transactions'):
         df = getTransactions()
-        getTransactionsMap(df)
+        data = df[['State','Transacion_count']]
+        data_frame = data.groupby(by ="State").sum()
+        data_frame.reset_index(inplace = True) 
+        avl_year = getTransactions()
+        years = avl_year
+        st.write(years)
+        suboption = st.selectbox('Select te year',('','2018'))
+           
+           #getTransactionsMap(data_frame)
         
+        
+          # if(suboption == '2018'):
+              
+             # st.write(avl_year)
 
 if selected =="Users":
     option = st.selectbox(
