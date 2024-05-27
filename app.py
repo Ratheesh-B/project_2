@@ -7,7 +7,6 @@ import os
 import json
 from streamlit_option_menu import option_menu
 from PIL import Image
-from git.repo.base import Repo
 
 
 def getTransactions():
