@@ -151,8 +151,8 @@ with st.sidebar:
 
 if selected =="Insurance":
     st.write("under development")
-    option = st.selectbox('Select one option',('','Statewise Analytics'))
-    if(option == 'Statewise Analytics'):
+    option = st.selectbox('Select one option',('','Nationwide Total Insurance'))
+    if(option == 'Nationwide Total Insurance'):
         df = getInsurance()
         getTransactionsMap(df)
 
@@ -160,8 +160,8 @@ if selected =="Insurance":
 if selected == "Transactions":
     option = st.selectbox(
      'Select one option',
-       ('','Statewise Analytics'))
-    if(option == 'Statewise Analytics'):
+       ('','Nationwide Total Transactions'))
+    if(option == 'Nationwide Total Transactions'):
         df = getTransactions()
         getTransactionsMap(df)
         
@@ -169,8 +169,8 @@ if selected == "Transactions":
 if selected =="Users":
     option = st.selectbox(
      'Select one option',
-       ('','Statewide Users'))
-    if(option == 'Statewise Analytics'):
+       ('','Nationwide Total Users'))
+    if(option == 'Nationwide Total Users'):
         df = getUsers()
         st.write(':green[Total Number of Registered users ]')
         getUsersDistribution(df)           
