@@ -114,7 +114,7 @@ def getTransactionsMap(df):
                   locations = 'State',
                   color = 'Transacion_count',
                   color_continuous_scale='blugrn')
-    fig2 = px.bar(df, x="Transacion_count", y="State",color='Transacion_count',color_continuous_scale = 'blugrn', orientation='h')
+    fig2 = px.bar(df, x="Transacion_count", y="State",color='Transacion_count',color_continuous_scale = 'blugrn' , orientation='h')
     fig1.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig1,use_container_width=True)
     st.plotly_chart(fig2,use_container_width=True)
@@ -176,8 +176,9 @@ if selected == "Transactions":
             df = data.groupby(by ="State").sum()
             df.reset_index(inplace = True)
             getTransactionsMap(df) 
-        else:
-            data_f = df[df['Year'] == suboption]    
+        elif(suboption!=' '):
+            y = str(suboption)
+            data_f = df[df['Year'] == y]    
             data_frame = data_f[['State','Transacion_count']]
             data_frame.reset_index(inplace = True)
             getTransactionsMap(data_frame) 
