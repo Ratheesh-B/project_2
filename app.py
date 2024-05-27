@@ -70,6 +70,31 @@ def getInsurance():
     df.reset_index(inplace = True)                 
     return df
 
+def getUsers():
+    path = "C:\\Users\\HP\\Dataset\\pulse\\data\\aggregated\\user\\country\\india\\state"
+    Agg_state_list=os.listdir(path)
+    users={'State':[], 'Year':[],'Quater':[],'Registeredusers':[]}
+    
+    for i in Agg_state_list:
+        p_i=path+"\\"+i+"\\"
+        Agg_yr=os.listdir(p_i)
+        for j in Agg_yr:
+            p_j=p_i+"\\"+j+"\\"
+            Agg_yr_list=os.listdir(p_j)
+            for k in Agg_yr_list:
+                p_k=p_j+k
+                Data=open(p_k,'r')
+                js=json.load(Data)
+                registeredusers = js['data']["aggregated"]["registeredUsers"]
+                users['State'].append(i)
+                users["Year"].append(j)
+                users["Quater"].append(k)
+                users['Registeredusers'].append(registeredusers)
+    Agg_Users=pd.DataFrame(users)
+    data = Agg_Users[['State','Registeredusers']]
+    df = data.groupby(by ="State").sum()
+    df.reset_index(inplace = True)                 
+    return df    
 
 def getTransactionsMap(df):
     fig = px.choropleth(
@@ -95,7 +120,17 @@ def getTransactionsMap(df):
     fig.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig,use_container_width=True)
 
-
+def getUsersDistribution(df):
+    fig = px.choropleth(
+                  df,
+                  geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
+                  featureidkey='properties.ST_NM',
+                  locations = 'State',
+                  color = 'Registeredusers',
+                  color_continuous_scale='blugrn')
+        
+    fig.update_geos(fitbounds="locations", visible=False)
+    st.plotly_chart(fig,use_container_width=True)
 
 # Setting up page configuration
 icon = Image.open(r"C:\Users\HP\Downloads\pngtree-analytics-icon-design-template-vector-isolated-png-image_745938.jpg")
@@ -132,5 +167,11 @@ if selected == "Transactions":
         
 
 if selected =="Users":
-    st.write("under development")            
+    option = st.selectbox(
+     'Select one option',
+       ('','Statewide Users'))
+    if(option == 'Statewise Analytics'):
+        df = getUsers()
+        st.write(':green[Total Number of Registered users ]')
+        getUsersDistribution(df)           
             
