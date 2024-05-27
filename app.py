@@ -107,16 +107,17 @@ def getInsuranceMap(df):
     st.plotly_chart(fig2,use_container_width=True)
 
 def getTransactionsMap(df):
-    fig = px.choropleth(
+    fig1 = px.choropleth(
                   df,
                   geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
                   featureidkey='properties.ST_NM',
                   locations = 'State',
                   color = 'Transacion_count',
                   color_continuous_scale='blugrn')
-        
-    fig.update_geos(fitbounds="locations", visible=False)
-    st.plotly_chart(fig,use_container_width=True)
+    fig2 = px.bar(df, x="Transacion_count", y="State",color='Transacion_count',color_continuous_scale = 'blugrn', orientation='h')
+    fig1.update_geos(fitbounds="locations", visible=False)
+    st.plotly_chart(fig1,use_container_width=True)
+    st.plotly_chart(fig2,use_container_width=True)
 
 def getUsersDistribution(df):
     fig = px.choropleth(
@@ -163,21 +164,25 @@ if selected == "Transactions":
        ('','Nationwide Total Transactions'))
     if(option == 'Nationwide Total Transactions'):
         df = getTransactions()
-        data = df[['State','Transacion_count']]
-        data_frame = data.groupby(by ="State").sum()
-        data_frame.reset_index(inplace = True) 
         avl_year = getTransactions()
-        years = avl_year
-        st.write(years)
-        suboption = st.selectbox('Select te year',('','2018'))
-           
-           #getTransactionsMap(data_frame)
-        
-        
-          # if(suboption == '2018'):
-              
-             # st.write(avl_year)
+        l=[]
+        l.append(' ')
+        l.append('all')
+        years = df.Year.unique()
+        l.extend(years)
+        suboption = st.selectbox('Select the year',l)
+        if(suboption == 'all'):
+            data = df[['State','Transacion_count']]
+            df = data.groupby(by ="State").sum()
+            df.reset_index(inplace = True)
+            getTransactionsMap(df) 
+        else:
+            data_f = df[df['Year'] == suboption]    
+            data_frame = data_f[['State','Transacion_count']]
+            data_frame.reset_index(inplace = True)
+            getTransactionsMap(data_frame) 
 
+           
 if selected =="Users":
     option = st.selectbox(
      'Select one option',
