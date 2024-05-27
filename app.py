@@ -37,7 +37,35 @@ def getTransactions():
     df.reset_index(inplace = True)                 
     return df
 
-def getTransactionsMapping(df):
+def getInsurance():
+    path = "C:\\Users\\HP\\Dataset\\pulse\\data\\aggregated\\insurance\\country\\india\\state"
+    Agg_state_list=os.listdir(path)
+    clm={'State':[], 'Year':[],'Quater':[],'Transacion_type':[], 'Transacion_count':[], 'Transacion_amount':[]}
+    for i in Agg_state_list:
+        p_i=path+"\\"+i+"\\"
+        Agg_yr=os.listdir(p_i)
+        for j in Agg_yr:
+            p_j=p_i+"\\"+j+"\\"
+            Agg_yr_list=os.listdir(p_j)
+            for k in Agg_yr_list:
+                p_k=p_j+k
+                Data=open(p_k,'r')
+                js=json.load(Data)
+                for l in js['data']['transactionData']:
+                    clm['Transacion_type'].append(l['name'])
+                    clm['Transacion_count'].append(l['paymentInstruments'][0]['count'])
+                    clm['Transacion_amount'].append(l['paymentInstruments'][0]['amount'])
+                    clm['State'].append(i)
+                    clm["Year"].append(j)
+                    clm["Quater"].append(k)
+    Agg_Trans=pd.DataFrame(clm)
+    data = Agg_Trans[['State','Transacion_count']]
+    df = data.groupby(by ="State").sum()
+    df.reset_index(inplace = True)                 
+    return df
+
+
+def getTransactionsMap(df):
     fig = px.choropleth(
                   df,
                   geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
@@ -48,6 +76,20 @@ def getTransactionsMapping(df):
         
     fig.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig,use_container_width=True)
+
+def getTransactionsMap(df):
+    fig = px.choropleth(
+                  df,
+                  geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
+                  featureidkey='properties.ST_NM',
+                  locations = 'State',
+                  color = 'Transacion_count',
+                  color_continuous_scale='blugrn')
+        
+    fig.update_geos(fitbounds="locations", visible=False)
+    st.plotly_chart(fig,use_container_width=True)
+
+
 
 # Setting up page configuration
 icon = Image.open(r"C:\Users\HP\Downloads\pngtree-analytics-icon-design-template-vector-isolated-png-image_745938.jpg")
@@ -68,6 +110,10 @@ with st.sidebar:
 
 if selected =="Insurance":
     st.write("under development")
+    option = st.selectbox('Select one option',('','Statewise Analytics'))
+    if(option == 'Statewise Analytics'):
+        df = getInsurance()
+        getTransactionsMap(df)
 
 
 if selected == "Transactions":
@@ -76,7 +122,7 @@ if selected == "Transactions":
        ('','Statewise Analytics'))
     if(option == 'Statewise Analytics'):
         df = getTransactions()
-        getTransactionsMapping(df)
+        getTransactionsMap(df)
         
 
 if selected =="Users":
