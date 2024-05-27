@@ -7,6 +7,13 @@ import os
 import json
 from streamlit_option_menu import option_menu
 from PIL import Image
+import mysql.connector as mc
+
+mydb= mc.connect(host='localhost' , user='root' , password='1234' , database = 'sample4')
+mycursor=mydb.cursor()
+
+#mycursor.execute('CREATE TABLE IF NOT EXISTS Channel(channel_id VARCHAR(255) PRIMARY KEY,playlist_id VARCHAR(255),channel_name VARCHAR(255),channel_type VARCHAR(255),total_videos INT,channel_views INT,channel_description VARCHAR(255),channel_status VARCHAR(255))')
+#mycursor.execute('CREATE TABLE IF NOT EXISTS Channel(channel_id VARCHAR(255) PRIMARY KEY,playlist_id VARCHAR(255),channel_name VARCHAR(255),channel_type VARCHAR(255),total_videos INT,channel_views INT,channel_description VARCHAR(255),channel_status VARCHAR(255))')
 
 
 def getTransactions():
