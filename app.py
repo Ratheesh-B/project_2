@@ -103,19 +103,23 @@ def getInsuranceMap(df):
                   color_continuous_scale='blugrn')
     fig2 = px.bar(df, x="Transacion_count", y="State",color='Transacion_count',color_continuous_scale = 'blugrn', orientation='h')
     fig1.update_geos(fitbounds="locations", visible=False)
+    fig2.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig1,use_container_width=True)
     st.plotly_chart(fig2,use_container_width=True)
 
-def getTransactionsMap(df):
+def getTransactionsMap(df , mini , maxi):
     fig1 = px.choropleth(
                   df,
                   geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
                   featureidkey='properties.ST_NM',
                   locations = 'State',
                   color = 'Transacion_count',
-                  color_continuous_scale='blugrn')
+                  color_continuous_scale='blugrn') 
     fig2 = px.bar(df, x="Transacion_count", y="State",color='Transacion_count',color_continuous_scale = 'blugrn' , orientation='h')
+    fig1.update_traces(showscale=False)
     fig1.update_geos(fitbounds="locations", visible=False)
+    fig2.update_traces(showscale=False)
+    fig2.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig1,use_container_width=True)
     st.plotly_chart(fig2,use_container_width=True)
 
@@ -173,15 +177,23 @@ if selected == "Transactions":
         suboption = st.selectbox('Select the year',l)
         if(suboption == 'all'):
             data = df[['State','Transacion_count']]
+            mini = df['Transacion_count'].min()
+            maxi = df['Transacion_count'].max()
             df = data.groupby(by ="State").sum()
             df.reset_index(inplace = True)
-            getTransactionsMap(df) 
+            st.write(mini)
+            st.write(maxi)
+            getTransactionsMap(df, mini , maxi) 
         elif(suboption!=' '):
             y = str(suboption)
             data_f = df[df['Year'] == y]    
             data_frame = data_f[['State','Transacion_count']]
+            minim = data_f['Transacion_count'].min()
+            maxim = data_f['Transacion_count'].max()
+            st.write(minim)
+            st.write(maxim)
             data_frame.reset_index(inplace = True)
-            getTransactionsMap(data_frame) 
+            getTransactionsMap(data_frame , minim , maxim) 
 
            
 if selected =="Users":
