@@ -61,11 +61,8 @@ def getInsurance():
                     clm['State'].append(i)
                     clm["Year"].append(j)
                     clm["Quater"].append(k)
-    Agg_ins=pd.DataFrame(clm)
-    data = Agg_ins[['State','Transacion_count']]
-    df = data.groupby(by ="State").sum()
-    df.reset_index(inplace = True)                   
-    return df
+    Agg_ins=pd.DataFrame(clm)                    
+    return Agg_ins
 
 def getUsers():
     path = "C:\\Users\\HP\\Dataset\\pulse\\data\\aggregated\\user\\country\\india\\state"
@@ -118,6 +115,7 @@ def getTransactionsMap(df):
     fig2 = px.bar(df, x="Transacion_count", y="State", color = 'Transacion_count', color_continuous_scale = 'blugrn' , orientation='h')
     fig1.update_traces(showscale=False)
     fig1.update_geos(fitbounds="locations", visible=False)
+    fig2.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig1,use_container_width=True)
     st.plotly_chart(fig2,use_container_width=True)
 
@@ -153,11 +151,28 @@ with st.sidebar:
     
 
 if selected =="Insurance":
-    st.write("under development")
     option = st.selectbox('Select one option',('','Nationwide Total Insurance'))
     if(option == 'Nationwide Total Insurance'):
         df = getInsurance()
-        getInsuranceMap(df)
+        avl_year = getInsurance()
+        l=[]
+        l.append(' ')
+        l.append('all')
+        years = df.Year.unique()
+        l.extend(years)
+        suboption = st.selectbox('Select the year',l)
+        if(suboption == 'all'):
+            data = df[['State','Transacion_count']]
+            df = data.groupby(by ="State").sum()
+            df.reset_index(inplace = True)
+            getInsuranceMap(df)
+        elif(suboption!=' '):
+            y = str(suboption)
+            data_f = df[df['Year'] == y]    
+            data_frame = data_f[['State','Transacion_count']]
+            fin_data = data_frame.groupby(by ="State").sum()
+            fin_data.reset_index(inplace = True)
+            getInsuranceMap(fin_data) 
 
 
 if selected == "Transactions":
@@ -184,7 +199,7 @@ if selected == "Transactions":
             data_frame = data_f[['State','Transacion_count']]
             fin_data = data_frame.groupby(by ="State").sum()
             fin_data.reset_index(inplace = True)
-            getTransactionsMap(fin_data ) 
+            getTransactionsMap(fin_data) 
            
 if selected =="Users":
     option = st.selectbox(
