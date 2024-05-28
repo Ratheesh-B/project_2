@@ -19,7 +19,7 @@ mycursor=mydb.cursor()
 def getTransactions():
     path = "C:\\Users\\HP\\Dataset\\pulse\\data\\aggregated\\transaction\\country\\india\\state"
     Agg_state_list=os.listdir(path)
-    clm={'State':[], 'Year':[],'Quater':[],'Transacion_type':[], 'Transacion_count':[], 'Transacion_amount':[]}
+    clm={'State':[], 'Year':[],'Quater':[],'Transaction_type':[], 'Transaction_count':[], 'Transaction_amount':[]}
     for i in Agg_state_list:
         p_i=path+"\\"+i+"\\"
         Agg_yr=os.listdir(p_i)
@@ -31,9 +31,9 @@ def getTransactions():
                 Data=open(p_k,'r')
                 js=json.load(Data)
                 for l in js['data']['transactionData']:
-                    clm['Transacion_type'].append(l['name'])
-                    clm['Transacion_count'].append(l['paymentInstruments'][0]['count'])
-                    clm['Transacion_amount'].append(l['paymentInstruments'][0]['amount'])
+                    clm['Transaction_type'].append(l['name'])
+                    clm['Transaction_count'].append(l['paymentInstruments'][0]['count'])
+                    clm['Transaction_amount'].append(l['paymentInstruments'][0]['amount'])
                     clm['State'].append(i)
                     clm["Year"].append(j)
                     clm["Quater"].append(k)
@@ -43,7 +43,7 @@ def getTransactions():
 def getInsurance():
     path = "C:\\Users\\HP\\Dataset\\pulse\\data\\aggregated\\insurance\\country\\india\\state"
     Agg_state_list=os.listdir(path)
-    clm={'State':[], 'Year':[],'Quater':[],'Transacion_type':[], 'Transacion_count':[], 'Transacion_amount':[]}
+    clm={'State':[], 'Year':[],'Quater':[],'Transaction_type':[], 'Transaction_count':[], 'Transaction_amount':[]}
     for i in Agg_state_list:
         p_i=path+"\\"+i+"\\"
         Agg_yr=os.listdir(p_i)
@@ -55,9 +55,9 @@ def getInsurance():
                 Data=open(p_k,'r')
                 js=json.load(Data)
                 for l in js['data']['transactionData']:
-                    clm['Transacion_type'].append(l['name'])
-                    clm['Transacion_count'].append(l['paymentInstruments'][0]['count'])
-                    clm['Transacion_amount'].append(l['paymentInstruments'][0]['amount'])
+                    clm['Transaction_type'].append(l['name'])
+                    clm['Transaction_count'].append(l['paymentInstruments'][0]['count'])
+                    clm['Transaction_amount'].append(l['paymentInstruments'][0]['amount'])
                     clm['State'].append(i)
                     clm["Year"].append(j)
                     clm["Quater"].append(k)
@@ -84,11 +84,8 @@ def getUsers():
                 users["Year"].append(j)
                 users["Quater"].append(k)
                 users['Registeredusers'].append(registeredusers)
-    Agg_Users=pd.DataFrame(users)
-    data = Agg_Users[['State','Registeredusers']]
-    df = data.groupby(by ="State").sum()
-    df.reset_index(inplace = True)                 
-    return df    
+    Agg_Users=pd.DataFrame(users)                  
+    return Agg_Users    
 
 def getInsuranceMap(df):
     fig1 = px.choropleth(
@@ -96,9 +93,9 @@ def getInsuranceMap(df):
                   geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
                   featureidkey='properties.ST_NM',
                   locations = 'State',
-                  color = 'Transacion_count',
+                  color = 'Transaction_count',
                   color_continuous_scale='blugrn')
-    fig2 = px.bar(df, x="Transacion_count", y="State",color='Transacion_count',color_continuous_scale = 'blugrn', orientation='h')
+    fig2 = px.bar(df, x="Transaction_count", y="State",color='Transaction_count',color_continuous_scale = 'blugrn', orientation='h')
     fig1.update_geos(fitbounds="locations", visible=False)
     fig2.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig1,use_container_width=True)
@@ -110,27 +107,28 @@ def getTransactionsMap(df):
                   geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
                   featureidkey='properties.ST_NM',
                   locations = 'State',
-                  color = 'Transacion_count',
+                  color = 'Transaction_count',
                   color_continuous_scale='blugrn') 
-    fig2 = px.bar(df, x="Transacion_count", y="State", color = 'Transacion_count', color_continuous_scale = 'blugrn' , orientation='h')
+    fig2 = px.bar(df, x="Transaction_count", y="State", color = 'Transaction_count', color_continuous_scale = 'blugrn' , orientation='h')
     fig1.update_traces(showscale=False)
     fig1.update_geos(fitbounds="locations", visible=False)
     fig2.update_geos(fitbounds="locations", visible=False)
     st.plotly_chart(fig1,use_container_width=True)
     st.plotly_chart(fig2,use_container_width=True)
 
-def getUsersDistribution(df):
-    fig = px.choropleth(
+def getUsersMap(df):
+    fig1 = px.choropleth(
                   df,
                   geojson="https://gist.githubusercontent.com/Ratheesh-B/84642d9197b0a2b93785585fb45a887f/raw/a093adf6dd2ff3a189d523ae944b146027d96815/india_states.geojson",
                   featureidkey='properties.ST_NM',
                   locations = 'State',
                   color = 'Registeredusers',
                   color_continuous_scale='blugrn')
-        
-    fig.update_geos(fitbounds="locations", visible=False)
-    st.plotly_chart(fig,use_container_width=True)
-
+    fig2 = px.bar(df, x="Registeredusers", y="State", color = 'Registeredusers', color_continuous_scale = 'blugrn' , orientation='h')    
+    fig1.update_geos(fitbounds="locations", visible=False)
+    fig2.update_geos(fitbounds="locations", visible=False)
+    st.plotly_chart(fig1,use_container_width=True)
+    st.plotly_chart(fig2,use_container_width=True)
 
 
 # Setting up page configuration
@@ -162,14 +160,14 @@ if selected =="Insurance":
         l.extend(years)
         suboption = st.selectbox('Select the year',l)
         if(suboption == 'all'):
-            data = df[['State','Transacion_count']]
+            data = df[['State','Transaction_count']]
             df = data.groupby(by ="State").sum()
             df.reset_index(inplace = True)
             getInsuranceMap(df)
         elif(suboption!=' '):
             y = str(suboption)
             data_f = df[df['Year'] == y]    
-            data_frame = data_f[['State','Transacion_count']]
+            data_frame = data_f[['State','Transaction_count']]
             fin_data = data_frame.groupby(by ="State").sum()
             fin_data.reset_index(inplace = True)
             getInsuranceMap(fin_data) 
@@ -189,14 +187,14 @@ if selected == "Transactions":
         l.extend(years)
         suboption = st.selectbox('Select the year',l)
         if(suboption == 'all'):
-            data = df[['State','Transacion_count']]
+            data = df[['State','Transaction_count']]
             df = data.groupby(by ="State").sum()
             df.reset_index(inplace = True)
             getTransactionsMap(df)
         elif(suboption!=' '):
             y = str(suboption)
             data_f = df[df['Year'] == y]    
-            data_frame = data_f[['State','Transacion_count']]
+            data_frame = data_f[['State','Transaction_count']]
             fin_data = data_frame.groupby(by ="State").sum()
             fin_data.reset_index(inplace = True)
             getTransactionsMap(fin_data) 
@@ -207,6 +205,27 @@ if selected =="Users":
        ('','Nationwide Total Users'))
     if(option == 'Nationwide Total Users'):
         df = getUsers()
-        st.write(':green[Total Number of Registered users ]')
-        getUsersDistribution(df)           
+        avl_year = getTransactions()
+        l=[]
+        l.append(' ')
+        l.append('all')
+        years = df.Year.unique()
+        l.extend(years)
+        suboption = st.selectbox('Select the year',l)
+        if(suboption == 'all'):
+            st.write(':green[Total Number of Registered users ]')
+            data = df[['State','Registeredusers']]
+            df = data.groupby(by ="State").sum()
+            df.reset_index(inplace = True)
+            getUsersMap(df)
+        elif(suboption!=' '):
+            st.write(':green[Total Number of Registered users ]')
+            y = str(suboption)
+            data_f = df[df['Year'] == y]    
+            data_frame = data_f[['State','Registeredusers']]
+            fin_data = data_frame.groupby(by ="State").sum()
+            fin_data.reset_index(inplace = True)
+            getUsersMap(fin_data) 
+        
+                   
             
